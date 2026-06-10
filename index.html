@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乐选购(LEXUAN.COM)-正品低价、品质保障、配送及时、轻松购物！</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <!-- 公共顶部栏 -->
+    <div id="commonTopBar"></div>
+    <!-- 公共头部 -->
+    <div id="commonHeader"></div>
+
+    <!-- 首页主体 -->
+    <div class="container main-content">
+        <!-- 分类 + 轮播 + 侧边广告 -->
+        <div class="hero-section">
+            <!-- 左侧分类 -->
+            <ul class="side-category">
+                <li>📱 <strong>手机通讯</strong></li>
+                <li>💻 <strong>电脑办公</strong></li>
+                <li>🏠 <strong>家用电器</strong></li>
+                <li>👗 <strong>服饰鞋靴</strong></li>
+                <li>🍎 <strong>食品生鲜</strong></li>
+                <li>💄 <strong>美妆护肤</strong></li>
+                <li>⚽ <strong>运动户外</strong></li>
+                <li>📚 <strong>图书文娱</strong></li>
+                <li>🛋️ <strong>家居家装</strong></li>
+                <li>🚗 <strong>汽车用品</strong></li>
+            </ul>
+
+            <!-- 轮播图 -->
+            <div class="banner-wrapper" id="bannerWrapper">
+                <div class="banner-slider" id="bannerSlider"></div>
+                <button class="banner-arrow prev" onclick="prevSlide()">‹</button>
+                <button class="banner-arrow next" onclick="nextSlide()">›</button>
+                <div class="banner-dots" id="bannerDots"></div>
+            </div>
+
+            <!-- 右侧小广告 -->
+            <div class="banner-side">
+                <div class="banner-side-item" onclick="location.href='profile.html'">
+                    👤<br>个人中心<br>会员权益
+                </div>
+                <div class="banner-side-item" onclick="location.href='cart.html'">
+                    🛒<br>购物车<br>去结算
+                </div>
+                <div class="banner-side-item" onclick="location.href='order.html'">
+                    📋<br>我的订单<br>查看物流
+                </div>
+            </div>
+        </div>
+
+        <!-- 秒杀区 -->
+        <div class="section-title">⚡ 乐选购秒杀</div>
+        <div class="seckill-section">
+            <div class="seckill-header">
+                <span class="seckill-title">乐选购秒杀</span>
+                <div class="seckill-countdown">
+                    <span id="hour1">0</span><span id="hour2">0</span>
+                    <span class="colon">:</span>
+                    <span id="min1">0</span><span id="min2">0</span>
+                    <span class="colon">:</span>
+                    <span id="sec1">0</span><span id="sec2">0</span>
+                    <span style="margin-left:8px;color:#333;">后结束</span>
+                </div>
+            </div>
+            <div class="seckill-products" id="seckillProducts"></div>
+        </div>
+
+        <!-- 手机通讯楼层 -->
+        <div class="section-title">📱 手机通讯</div>
+        <div class="product-grid" id="phoneGrid"></div>
+
+        <!-- 电脑办公楼层 -->
+        <div class="section-title">💻 电脑办公</div>
+        <div class="product-grid" id="computerGrid"></div>
+
+        <!-- 家用电器楼层 -->
+        <div class="section-title">🏠 家用电器</div>
+        <div class="product-grid" id="applianceGrid"></div>
+
+        <!-- 更多推荐 -->
+        <div class="section-title">🔥 为你推荐</div>
+        <div class="product-grid" id="recommendGrid"></div>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">
+        <div class="container">
+            <p>关于我们 | 联系我们 | 商家入驻 | 营销中心 | 友情链接 | 销售联盟 | 乐选购社区 | 乐选购公益</p>
+            <p>京公网安备 11000002000088号 | 京ICP备11041704号 | 互联网药品信息服务资格证 | 网络文化经营许可证</p>
+            <p class="student-info">学号：24215220111 &nbsp;&nbsp; 姓名：张乐 &nbsp;&nbsp; 《Web编程技术》大作业 - 乐选购商城项目</p>
+            <p>Copyright © 2024-2026 乐选购LEXUAN.com 版权所有</p>
+        </div>
+    </div>
+
+    <script src="js/data.js?v=2"></script>
+    <script>
+        // ============ 初始化公共头部 ============
+        initCommonHeader();
+
+        // ============ 轮播图 ============
+        let currentSlide = 0;
+        const banners = JDData.banners;
+
+        function renderBanner() {
+            const slider = document.getElementById('bannerSlider');
+            const dots = document.getElementById('bannerDots');
+            slider.innerHTML = banners.map((b, i) => `
+                <div class="banner-slide" style="background:${b.bg};">
+                    <div class="slide-text">
+                        ${b.title}
+                        <small>${b.subtitle}</small>
+                    </div>
+                </div>
+            `).join('');
+            dots.innerHTML = banners.map((_, i) =>
+                `<span class="${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
+            ).join('');
+        }
+
+        function updateSlide() {
+            const slider = document.getElementById('bannerSlider');
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.banner-dots span').forEach((dot, i) => {
+                dot.className = i === currentSlide ? 'active' : '';
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % banners.length;
+            updateSlide();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + banners.length) % banners.length;
+            updateSlide();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlide();
+        }
+
+        renderBanner();
+        setInterval(nextSlide, 4000);
+
+        // ============ 商品图片HTML（支持真实图片）============
+        function getProductImgHtml(product, size) {
+            if (product.img) {
+                const s = size || 'cover';
+                const styleMap = { small: 'width:100%;height:100%;object-fit:contain;', cover: 'width:100%;height:100%;object-fit:contain;' };
+                return `<img src="${product.img}" alt="${product.name}" style="${styleMap[s]||styleMap.cover}">`;
+            }
+            return `<span style="font-size:${size==='small'?'40px':'50px'};color:rgba(255,255,255,0.6);">${product.name.charAt(0)}</span>`;
+        }
+
+        // ============ 秒杀区 ============
+        function renderSeckill() {
+            const container = document.getElementById('seckillProducts');
+            container.innerHTML = JDData.seckillProducts.map(p => `
+                <div class="seckill-item" onclick="location.href='detail.html?id=${p.id}'">
+                    <div class="product-icon" style="background:${p.imgColor};">${getProductImgHtml(p,'small')}</div>
+                    <div class="seckill-price"><small>¥</small>${p.price}</div>
+                    <div class="old-price">¥${p.oldPrice}</div>
+                </div>
+            `).join('');
+        }
+        renderSeckill();
+
+        // ============ 秒杀倒计时 ============
+        function updateCountdown() {
+            const now = new Date();
+            const end = new Date(now);
+            end.setHours(23, 59, 59, 999);
+            const diff = Math.floor((end - now) / 1000);
+            const h = Math.floor(diff / 3600);
+            const m = Math.floor((diff % 3600) / 60);
+            const s = diff % 60;
+            const hStr = h.toString().padStart(2, '0');
+            const mStr = m.toString().padStart(2, '0');
+            const sStr = s.toString().padStart(2, '0');
+            document.getElementById('hour1').textContent = hStr[0];
+            document.getElementById('hour2').textContent = hStr[1];
+            document.getElementById('min1').textContent = mStr[0];
+            document.getElementById('min2').textContent = mStr[1];
+            document.getElementById('sec1').textContent = sStr[0];
+            document.getElementById('sec2').textContent = sStr[1];
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // ============ 商品卡片渲染 ============
+        function renderProductCard(product) {
+            return `
+                <div class="product-card" onclick="location.href='detail.html?id=${product.id}'">
+                    <div class="product-img" style="background:${product.imgColor};">
+                        ${product.tag ? `<span class="product-tag">${product.tag}</span>` : ''}
+                        ${getProductImgHtml(product)}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price"><small>¥</small>${product.price}</div>
+                        <div class="product-sold">已售 ${product.sold > 10000 ? (product.sold/10000).toFixed(1)+'万' : product.sold}+ 件</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProductGrid(containerId, categoryId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const products = JDData.getProductsByCategory(categoryId);
+            container.innerHTML = products.map(renderProductCard).join('');
+        }
+
+        function renderRecommendGrid() {
+            const container = document.getElementById('recommendGrid');
+            const shuffled = [...JDData.products].sort(() => Math.random() - 0.5).slice(0, 10);
+            container.innerHTML = shuffled.map(renderProductCard).join('');
+        }
+
+        renderProductGrid('phoneGrid', 1);
+        renderProductGrid('computerGrid', 2);
+        renderProductGrid('applianceGrid', 3);
+        renderRecommendGrid();
+    </script>
+</body>
+</html>

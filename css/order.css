@@ -1,0 +1,366 @@
+/* ============ 结算/订单页面样式 ============ */
+
+.order-page {
+    background: #fff;
+    padding: 30px 0;
+}
+
+.order-page h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.order-section {
+    margin-bottom: 25px;
+}
+
+.order-section h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 收货地址 */
+.address-list {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.address-card {
+    width: 280px;
+    padding: 15px;
+    border: 2px solid #eee;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.address-card:hover {
+    border-color: var(--jd-red);
+}
+
+.address-card.active {
+    border-color: var(--jd-red);
+    background: #fff5f5;
+}
+
+.address-card.active::after {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    color: var(--jd-red);
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.address-card .contact {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.address-card .phone {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.address-card .addr-detail {
+    font-size: 12px;
+    color: #999;
+    line-height: 1.5;
+}
+
+.address-card .addr-tag {
+    display: inline-block;
+    background: var(--jd-red);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 11px;
+    margin-right: 4px;
+}
+
+.btn-add-address {
+    width: 280px;
+    height: 100%;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #999;
+    font-size: 14px;
+    transition: var(--transition);
+    min-height: 100px;
+}
+
+.btn-add-address:hover {
+    border-color: var(--jd-red);
+    color: var(--jd-red);
+}
+
+/* 订单商品 */
+.order-items {
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-item .item-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: #fff;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.order-item .item-info {
+    flex: 1;
+}
+
+.order-item .item-name {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.order-item .item-spec {
+    font-size: 12px;
+    color: #999;
+}
+
+.order-item .item-price {
+    font-size: 16px;
+    color: var(--jd-red);
+    font-weight: bold;
+    margin: 0 30px;
+}
+
+.order-item .item-qty {
+    font-size: 14px;
+    color: #666;
+    margin: 0 30px;
+}
+
+.order-item .item-subtotal {
+    font-size: 16px;
+    color: var(--jd-red);
+    font-weight: bold;
+}
+
+/* 支付方式 */
+.payment-methods {
+    display: flex;
+    gap: 15px;
+}
+
+.payment-method {
+    padding: 12px 24px;
+    border: 2px solid #eee;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.payment-method:hover {
+    border-color: var(--jd-red);
+}
+
+.payment-method.active {
+    border-color: var(--jd-red);
+    background: #fff5f5;
+}
+
+/* 订单摘要 */
+.order-summary {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+.order-summary .summary-row {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.order-summary .summary-row span {
+    width: 100px;
+    text-align: right;
+}
+
+.order-summary .summary-row.total {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--jd-red);
+    border-top: 1px solid #ddd;
+    padding-top: 12px;
+    margin-top: 8px;
+}
+
+.order-summary .summary-row.total span {
+    font-size: 26px;
+}
+
+.order-summary .btn-submit {
+    width: 200px;
+    height: 48px;
+    background: var(--jd-red);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    float: right;
+    transition: var(--transition);
+}
+
+.order-summary .btn-submit:hover {
+    background: var(--jd-red-hover);
+}
+
+/* 订单成功 */
+.order-success {
+    text-align: center;
+    padding: 60px 0;
+}
+
+.order-success .success-icon {
+    width: 80px;
+    height: 80px;
+    background: #2ba14b;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 20px;
+}
+
+.order-success h2 {
+    font-size: 24px;
+    color: #2ba14b;
+    margin-bottom: 10px;
+}
+
+.order-success p {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 5px;
+}
+
+.order-success .order-id {
+    font-size: 18px;
+    color: var(--jd-red);
+    font-weight: bold;
+}
+
+.order-success .order-amount {
+    font-size: 24px;
+    color: var(--jd-red);
+    font-weight: bold;
+}
+
+/* 地址弹窗 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    background: #fff;
+    border-radius: 8px;
+    padding: 30px;
+    width: 500px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.modal .form-group {
+    margin-bottom: 15px;
+}
+
+.modal .form-group input,
+.modal .form-group select {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.modal .form-group input:focus {
+    border-color: var(--jd-red);
+}
+
+.modal .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal .modal-actions button {
+    padding: 8px 24px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.modal .btn-cancel {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.modal .btn-save {
+    background: var(--jd-red);
+    color: #fff;
+}

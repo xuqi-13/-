@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交订单 - 乐选购</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/order.css">
+</head>
+<body>
+    <div id="commonTopBar"></div>
+    <div id="commonHeader"></div>
+
+    <div class="container order-page" id="orderContent">
+        <!-- 动态渲染 -->
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p class="student-info">学号：24215220111 &nbsp;&nbsp; 姓名：张乐 &nbsp;&nbsp; 《Web编程技术》大作业</p>
+            <p>Copyright © 2024-2026 乐选购LEXUAN.com 版权所有</p>
+        </div>
+    </div>
+
+    <!-- 地址弹窗 -->
+    <div class="modal-overlay" id="addressModal" style="display:none;">
+        <div class="modal">
+            <h3>新增收货地址</h3>
+            <div class="form-group">
+                <input type="text" id="addrName" placeholder="收货人姓名">
+            </div>
+            <div class="form-group">
+                <input type="text" id="addrPhone" placeholder="手机号码" maxlength="11">
+            </div>
+            <div class="form-group" style="display:flex;gap:10px;">
+                <select id="addrProvince" style="flex:1;">
+                    <option value="">请选择省份</option>
+                    <option value="广东省">广东省</option>
+                    <option value="北京市">北京市</option>
+                    <option value="上海市">上海市</option>
+                    <option value="浙江省">浙江省</option>
+                    <option value="江苏省">江苏省</option>
+                    <option value="四川省">四川省</option>
+                    <option value="湖北省">湖北省</option>
+                </select>
+                <select id="addrCity" style="flex:1;">
+                    <option value="">请选择城市</option>
+                    <option value="深圳市">深圳市</option>
+                    <option value="广州市">广州市</option>
+                    <option value="北京市">北京市</option>
+                    <option value="上海市">上海市</option>
+                    <option value="杭州市">杭州市</option>
+                    <option value="南京市">南京市</option>
+                    <option value="成都市">成都市</option>
+                    <option value="武汉市">武汉市</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" id="addrDetail" placeholder="详细地址（街道、门牌号等）">
+            </div>
+            <div class="form-group">
+                <input type="text" id="addrTag" placeholder="地址标签（如：家、公司、学校）">
+            </div>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#666;margin-bottom:15px;cursor:pointer;">
+                <input type="checkbox" id="addrDefault"> 设为默认地址
+            </label>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeAddressModal()">取消</button>
+                <button class="btn-save" onclick="saveAddress()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js?v=2"></script>
+    <script>
+        initCommonHeader();
+
+        const user = UserManager.getCurrentUser();
+        if (!user) {
+            window.location.href = 'login.html';
+        }
+
+        let selectedAddressId = null;
+        let selectedPayment = 'wechat';
+        let addresses = AddressManager.getAddresses();
+        const checkedItems = CartManager.getCheckedItems();
+
+        // 如果没有选中商品，从购物车跳过来时取全部
+        if (checkedItems.length === 0) {
+            const allCart = CartManager.getCart();
+            if (allCart.length > 0) {
+                CartManager.toggleAllCheck(true);
+                // 重新获取
+                window.location.reload();
+            }
+        }
+
+        const currentCheckedItems = CartManager.getCheckedItems();
+
+        function renderOrderPage() {
+            const container = document.getElementById('orderContent');
+            addresses = AddressManager.getAddresses();
+
+            if (currentCheckedItems.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:80px 0;">
+                        <div style="font-size:60px;margin-bottom:20px;">📋</div>
+                        <p style="font-size:16px;color:#999;margin-bottom:20px;">没有待结算的商品</p>
+                        <a href="cart.html" class="btn btn-primary btn-lg">返回购物车</a>
+                    </div>
+                `;
+                return;
+            }
+
+            if (!selectedAddressId && addresses.length > 0) {
+                const defaultAddr = addresses.find(a => a.isDefault);
+                selectedAddressId = defaultAddr ? defaultAddr.id : addresses[0].id;
+            }
+
+            const subtotal = currentCheckedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const shipping = subtotal >= 99 ? 0 : 10;
+            const discount = Math.floor(subtotal * 0.05);
+            const total = subtotal + shipping - discount;
+
+            container.innerHTML = `
+                <h2>确认订单</h2>
+
+                <!-- 收货地址 -->
+                <div class="order-section">
+                    <h3>📍 收货地址</h3>
+                    <div class="address-list">
+                        ${addresses.map(addr => `
+                            <div class="address-card ${addr.id === selectedAddressId ? 'active' : ''}"
+                                 onclick="selectAddress(${addr.id})">
+                                ${addr.tag ? `<span class="addr-tag">${addr.tag}</span>` : ''}
+                                <div class="contact">${addr.name}</div>
+                                <div class="phone">${addr.phone}</div>
+                                <div class="addr-detail">${addr.province} ${addr.city} ${addr.detail}</div>
+                            </div>
+                        `).join('')}
+                        <div class="btn-add-address" onclick="openAddressModal()">
+                            + 新增地址
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 支付方式 -->
+                <div class="order-section">
+                    <h3>💳 支付方式</h3>
+                    <div class="payment-methods">
+                        <div class="payment-method ${selectedPayment === 'wechat' ? 'active' : ''}"
+                             onclick="selectPayment('wechat')">
+                            💚 微信支付
+                        </div>
+                        <div class="payment-method ${selectedPayment === 'alipay' ? 'active' : ''}"
+                             onclick="selectPayment('alipay')">
+                            💙 支付宝
+                        </div>
+                        <div class="payment-method ${selectedPayment === 'card' ? 'active' : ''}"
+                             onclick="selectPayment('card')">
+                            💳 银行卡
+                        </div>
+                        <div class="payment-method ${selectedPayment === 'cod' ? 'active' : ''}"
+                             onclick="selectPayment('cod')">
+                            💵 货到付款
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 商品清单 -->
+                <div class="order-section">
+                    <h3>📦 商品清单</h3>
+                    <div class="order-items">
+                        ${currentCheckedItems.map(function(item) {
+                            // 获取商品最新图片
+                            var prod = JDData.getProductById(item.productId);
+                            var itemImg = '';
+                            var itemImgColor = item.imgColor || '#ccc';
+                            if (prod && prod.img) {
+                                itemImg = '<img src="' + prod.img + '" alt="' + (prod.name || '') + '" style="width:100%;height:100%;object-fit:contain;background:#fff;">';
+                            } else if (item.img) {
+                                itemImg = '<img src="' + item.img + '" alt="' + (item.name || '') + '" style="width:100%;height:100%;object-fit:contain;background:#fff;">';
+                            }
+                            if (!itemImg) {
+                                itemImg = '<span style="color:rgba(255,255,255,0.6);">' + (item.name || '?').charAt(0) + '</span>';
+                            }
+                            return '<div class="order-item">' +
+                                '<div class="item-img" style="background:' + (prod && prod.imgColor ? prod.imgColor : itemImgColor) + ';">' + itemImg + '</div>' +
+                                '<div class="item-info">' +
+                                    '<div class="item-name">' + item.name + '</div>' +
+                                    '<div class="item-spec">规格：' + (item.spec || '默认') + '</div>' +
+                                '</div>' +
+                                '<div class="item-price">' + formatPrice(item.price) + '</div>' +
+                                '<div class="item-qty">×' + item.quantity + '</div>' +
+                                '<div class="item-subtotal">' + formatPrice(item.price * item.quantity) + '</div>' +
+                            '</div>';
+                        }).join('')}
+                    </div>
+                </div>
+
+                <!-- 订单摘要 -->
+                <div class="order-summary">
+                    <div class="summary-row">
+                        商品总额：<span>${formatPrice(subtotal)}</span>
+                    </div>
+                    <div class="summary-row">
+                        运费：<span>${shipping === 0 ? '免运费' : formatPrice(shipping)}</span>
+                    </div>
+                    <div class="summary-row">
+                        优惠：<span style="color:#2ba14b;">-${formatPrice(discount)}</span>
+                    </div>
+                    <div class="summary-row total">
+                        应付总额：<span>${formatPrice(total)}</span>
+                    </div>
+                    <button class="btn-submit" onclick="submitOrder(${total})">提交订单</button>
+                </div>
+            `;
+        }
+
+        function selectAddress(id) {
+            selectedAddressId = id;
+            renderOrderPage();
+        }
+
+        function selectPayment(method) {
+            selectedPayment = method;
+            renderOrderPage();
+        }
+
+        function openAddressModal() {
+            document.getElementById('addressModal').style.display = 'flex';
+        }
+
+        function closeAddressModal() {
+            document.getElementById('addressModal').style.display = 'none';
+            // 清空表单
+            ['addrName','addrPhone','addrDetail','addrTag'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+        }
+
+        function saveAddress() {
+            const name = document.getElementById('addrName').value.trim();
+            const phone = document.getElementById('addrPhone').value.trim();
+            const province = document.getElementById('addrProvince').value;
+            const city = document.getElementById('addrCity').value;
+            const detail = document.getElementById('addrDetail').value.trim();
+            const tag = document.getElementById('addrTag').value.trim();
+            const isDefault = document.getElementById('addrDefault').checked;
+
+            if (!name) { showToast('请输入收货人姓名'); return; }
+            if (!phone || !/^1[3-9]\d{9}$/.test(phone)) { showToast('请输入正确的手机号'); return; }
+            if (!province) { showToast('请选择省份'); return; }
+            if (!city) { showToast('请选择城市'); return; }
+            if (!detail) { showToast('请输入详细地址'); return; }
+
+            AddressManager.addAddress({
+                name,
+                phone: phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'),
+                province,
+                city,
+                detail,
+                tag: tag || undefined,
+                isDefault,
+            });
+
+            addresses = AddressManager.getAddresses();
+            if (isDefault) {
+                selectedAddressId = addresses[addresses.length - 1].id;
+            }
+
+            closeAddressModal();
+            showToast('地址添加成功');
+            renderOrderPage();
+        }
+
+        function submitOrder(total) {
+            if (!selectedAddressId) {
+                showToast('请选择收货地址');
+                return;
+            }
+
+            const address = addresses.find(a => a.id === selectedAddressId);
+            const orderData = {
+                userId: user.id,
+                username: user.username,
+                address: address,
+                payment: selectedPayment,
+                items: [...currentCheckedItems],
+                subtotal: currentCheckedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                shipping: total - currentCheckedItems.reduce((sum, item) => sum + item.price * item.quantity, 0) + Math.floor(currentCheckedItems.reduce((sum, item) => sum + item.price * item.quantity, 0) * 0.05),
+                discount: Math.floor(currentCheckedItems.reduce((sum, item) => sum + item.price * item.quantity, 0) * 0.05),
+                total: total,
+            };
+
+            const order = OrderManager.createOrder(orderData);
+
+            // 清空购物车中已购买的商品
+            CartManager.clearChecked();
+
+            // 显示成功页面
+            document.getElementById('orderContent').innerHTML = `
+                <div class="order-success">
+                    <div class="success-icon">✓</div>
+                    <h2>订单提交成功！</h2>
+                    <p>订单编号：<span class="order-id">${order.id}</span></p>
+                    <p>应付金额：<span class="order-amount">${formatPrice(total)}</span></p>
+                    <p>收货地址：${address.province} ${address.city} ${address.detail}</p>
+                    <p>支付方式：${selectedPayment === 'wechat' ? '微信支付' : selectedPayment === 'alipay' ? '支付宝' : selectedPayment === 'card' ? '银行卡' : '货到付款'}</p>
+                    <p style="margin-top:10px;color:#999;">请尽快完成支付，超时订单将自动取消</p>
+                    <div style="margin-top:30px;">
+                        <a href="profile.html" class="btn btn-primary btn-lg" style="margin-right:15px;">查看订单</a>
+                        <a href="index.html" class="btn btn-outline btn-lg">继续购物</a>
+                    </div>
+                </div>
+            `;
+
+            // 更新购物车数量
+            CartManager.updateCartCount();
+        }
+
+        renderOrderPage();
+
+        // 点击弹窗外部关闭
+        document.getElementById('addressModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddressModal();
+            }
+        });
+    </script>
+</body>
+</html>

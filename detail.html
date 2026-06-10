@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品详情 - 乐选购</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/detail.css">
+</head>
+<body>
+    <div id="commonTopBar"></div>
+    <div id="commonHeader"></div>
+
+    <div class="container detail-page">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="index.html">首页</a> <span>&gt;</span>
+            <a href="#" id="breadCategory">分类</a> <span>&gt;</span>
+            <span id="breadName">商品详情</span>
+        </div>
+
+        <!-- 商品主体 -->
+        <div class="detail-main" id="detailMain">
+            <div style="text-align:center;padding:100px 0;font-size:18px;color:#999;">商品加载中...</div>
+        </div>
+
+        <!-- 商品描述 -->
+        <div class="detail-desc" id="detailDesc"></div>
+
+        <!-- 用户评价 -->
+        <div class="reviews-section" id="reviewsSection"></div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p class="student-info">学号：24215220111 &nbsp;&nbsp; 姓名：张乐 &nbsp;&nbsp; 《Web编程技术》大作业</p>
+            <p>Copyright © 2024-2026 乐选购LEXUAN.com 版权所有</p>
+        </div>
+    </div>
+
+    <script src="js/data.js?v=2"></script>
+    <script>
+        initCommonHeader();
+
+        const productId = getUrlParam('id');
+        if (!productId) {
+            window.location.href = 'index.html';
+        }
+
+        const product = JDData.getProductById(productId);
+        if (!product) {
+            document.getElementById('detailMain').innerHTML =
+                '<div style="text-align:center;padding:100px 0;font-size:18px;color:#999;">商品不存在</div>';
+        } else {
+            // 面包屑
+            const category = JDData.categories.find(c => c.id === product.category);
+            document.getElementById('breadCategory').textContent = category ? category.name : '全部';
+            document.getElementById('breadName').textContent = product.name;
+
+            // 商品主体
+            const galleryColors = [
+                product.imgColor,
+                product.imgColor.replace(/[0-9a-fA-F]{2}$/, '88'),
+                product.imgColor.replace(/[0-9a-fA-F]{2}$/, 'aa'),
+                product.imgColor.replace(/[0-9a-fA-F]{2}$/, 'cc'),
+            ];
+
+            document.getElementById('detailMain').innerHTML = `
+                <div class="detail-gallery">
+                    <div class="gallery-main" id="galleryMain" style="background:${product.imgColor};">
+                        ${product.img ? `<img src="${product.img}" alt="${product.name}" style="width:100%;height:100%;object-fit:contain;">` : `<span style="font-size:120px;color:rgba(255,255,255,0.6);">${product.name.charAt(0)}</span>`}
+                    </div>
+                    <div class="gallery-thumbs" id="galleryThumbs">
+                        ${product.img ? `
+                            <div class="thumb active" onclick="switchGalleryImg(this, '${product.img}')"><img src="${product.img}" style="width:100%;height:100%;object-fit:contain;"></div>
+                        ` : galleryColors.map((c, i) => `
+                            <div class="thumb ${i === 0 ? 'active' : ''}" style="background:${c};" onclick="switchGallery(this, '${c}')">
+                                <span style="color:rgba(255,255,255,0.5);">${i+1}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="detail-info">
+                    <h1 class="product-title">${product.name}</h1>
+                    <div class="product-subtitle">${product.tag ? '【'+product.tag+'】' : ''}${product.desc}</div>
+
+                    <div class="detail-price-box">
+                        <div class="price-label">乐选购价</div>
+                        <span class="current-price"><small>¥</small>${product.price}</span>
+                        <span class="old-price">¥${product.oldPrice}</span>
+                        <span class="discount-tag">省¥${product.oldPrice - product.price}</span>
+                        <div style="margin-top:8px;font-size:12px;color:#999;">
+                            已售 ${product.sold > 10000 ? (product.sold/10000).toFixed(1)+'万' : product.sold}+ 件
+                            &nbsp;&nbsp;⭐ ${product.rating} 分
+                        </div>
+                    </div>
+
+                    <div class="detail-promo">
+                        <span class="promo-label">促销</span>
+                        <span class="promo-value">满300减50 | 满500减100 | 领券更优惠</span>
+                    </div>
+                    <div class="detail-promo">
+                        <span class="promo-label">配送</span>
+                        <span class="promo-value">乐选购物流 211限时达 支持货到付款</span>
+                    </div>
+                    <div class="detail-promo">
+                        <span class="promo-label">服务</span>
+                        <span class="promo-value">7天无理由退货 | 30天价保 | 正品保证</span>
+                    </div>
+
+                    <div class="spec-section">
+                        <div class="spec-title">颜色分类</div>
+                        <div class="spec-options" id="colorOptions">
+                            <span class="spec-option active" onclick="selectSpec(this)">默认</span>
+                            <span class="spec-option" onclick="selectSpec(this)">升级版</span>
+                            <span class="spec-option" onclick="selectSpec(this)">旗舰版</span>
+                        </div>
+                    </div>
+
+                    <div class="spec-section">
+                        <div class="spec-title">数量</div>
+                        <div class="quantity-box">
+                            <button class="qty-btn" onclick="changeQty(-1)">-</button>
+                            <input type="text" id="buyQty" value="1" onchange="validateQty()">
+                            <button class="qty-btn" onclick="changeQty(1)">+</button>
+                            <span style="margin-left:15px;font-size:12px;color:#999;">库存充足</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-actions">
+                        <button class="btn-add-cart" onclick="addToCart()">🛒 加入购物车</button>
+                        <button class="btn-buy-now" onclick="buyNow()">⚡ 立即购买</button>
+                    </div>
+                </div>
+            `;
+
+            // 商品描述
+            document.getElementById('detailDesc').innerHTML = `
+                <h3>商品详情</h3>
+                <div class="desc-content">
+                    <p>${product.desc}</p>
+                    <p style="margin-top:15px;">本商品由乐选购自营提供，100%正品保证，支持7天无理由退货。</p>
+                </div>
+                <ul class="feature-list">
+                    ${product.features.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+            `;
+
+            // 用户评价
+            const reviews = [
+                { user: 'j***d', stars: 5, text: '质量非常好，物流很快，乐选购自营值得信赖，已经是老顾客了！' },
+                { user: '张***8', stars: 5, text: '包装很严实，产品没有任何损坏，使用效果很棒，推荐购买。' },
+                { user: 'L***m', stars: 4, text: '性价比很高，比实体店便宜不少，功能也齐全，好评！' },
+                { user: '小***鱼', stars: 5, text: '乐选购物流一如既往地快，昨天下单今天就到了，产品质量也很好！' },
+            ];
+
+            document.getElementById('reviewsSection').innerHTML = `
+                <h3>用户评价（${reviews.length}）</h3>
+                ${reviews.map(r => `
+                    <div class="review-item">
+                        <div class="review-user">${r.user} · ${new Date(Date.now() - Math.random()*30*86400000).toLocaleDateString()}</div>
+                        <div class="review-stars">${'⭐'.repeat(r.stars)}</div>
+                        <div class="review-text">${r.text}</div>
+                    </div>
+                `).join('')}
+            `;
+
+            // 更新标题
+            document.title = product.name + ' - 乐选购';
+        }
+
+        // ============ 画廊切换 ============
+        function switchGallery(el, color) {
+            document.querySelectorAll('.gallery-thumbs .thumb').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            const main = document.getElementById('galleryMain');
+            main.style.background = color;
+            main.innerHTML = `<span style="font-size:120px;color:rgba(255,255,255,0.6);">${product.name.charAt(0)}</span>`;
+        }
+
+        function switchGalleryImg(el, imgSrc) {
+            document.querySelectorAll('.gallery-thumbs .thumb').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            const main = document.getElementById('galleryMain');
+            main.style.background = product.imgColor;
+            main.innerHTML = `<img src="${imgSrc}" alt="${product.name}" style="width:100%;height:100%;object-fit:contain;">`;
+        }
+
+        // ============ 规格选择 ============
+        function selectSpec(el) {
+            document.querySelectorAll('#colorOptions .spec-option').forEach(o => o.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // ============ 数量调整 ============
+        function changeQty(delta) {
+            const input = document.getElementById('buyQty');
+            let val = parseInt(input.value) || 1;
+            val = Math.max(1, val + delta);
+            val = Math.min(99, val);
+            input.value = val;
+        }
+
+        function validateQty() {
+            const input = document.getElementById('buyQty');
+            let val = parseInt(input.value) || 1;
+            val = Math.max(1, Math.min(99, val));
+            input.value = val;
+        }
+
+        // ============ 加入购物车 ============
+        function addToCart() {
+            if (!UserManager.getCurrentUser()) {
+                if (confirm('请先登录后再添加商品到购物车，是否前往登录？')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+            const qty = parseInt(document.getElementById('buyQty').value) || 1;
+            const spec = document.querySelector('#colorOptions .spec-option.active')?.textContent || '默认';
+            const result = CartManager.addItem(productId, qty, spec);
+            showToast(result.message);
+            CartManager.updateCartCount();
+        }
+
+        // ============ 立即购买 ============
+        function buyNow() {
+            if (!UserManager.getCurrentUser()) {
+                if (confirm('请先登录后再购买，是否前往登录？')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+            const qty = parseInt(document.getElementById('buyQty').value) || 1;
+            const spec = document.querySelector('#colorOptions .spec-option.active')?.textContent || '默认';
+            CartManager.addItem(productId, qty, spec);
+            window.location.href = 'order.html';
+        }
+    </script>
+</body>
+</html>

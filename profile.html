@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 乐选购</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+    <div id="commonTopBar"></div>
+    <div id="commonHeader"></div>
+
+    <div class="container profile-page">
+        <div class="profile-layout">
+            <!-- 侧边栏 -->
+            <div class="profile-sidebar">
+                <div class="user-card" id="userCard">
+                    <div class="avatar" id="userAvatar">U</div>
+                    <div class="username" id="sidebarUsername">未登录</div>
+                    <div class="level" id="sidebarLevel"></div>
+                </div>
+                <ul class="profile-menu">
+                    <li class="active" data-page="info" onclick="switchPage('info', this)">
+                        <span class="menu-icon">👤</span> 个人信息
+                    </li>
+                    <li data-page="orders" onclick="switchPage('orders', this)">
+                        <span class="menu-icon">📋</span> 我的订单
+                    </li>
+                    <li data-page="address" onclick="switchPage('address', this)">
+                        <span class="menu-icon">📍</span> 收货地址
+                    </li>
+                    <li data-page="security" onclick="switchPage('security', this)">
+                        <span class="menu-icon">🔒</span> 安全设置
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 内容区 -->
+            <div class="profile-content" id="profileContent">
+                <!-- 动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p class="student-info">学号：24215220111 &nbsp;&nbsp; 姓名：张乐 &nbsp;&nbsp; 《Web编程技术》大作业</p>
+            <p>Copyright © 2024-2026 乐选购LEXUAN.com 版权所有</p>
+        </div>
+    </div>
+
+    <script src="js/data.js?v=2"></script>
+    <script>
+        initCommonHeader();
+
+        const user = UserManager.getCurrentUser();
+        if (!user) {
+            window.location.href = 'login.html';
+        }
+
+        // 初始化侧边栏用户信息
+        document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+        document.getElementById('sidebarUsername').textContent = user.username;
+        document.getElementById('sidebarLevel').textContent = user.level || '普通会员';
+
+        let currentPage = 'info';
+
+        function switchPage(page, el) {
+            currentPage = page;
+            document.querySelectorAll('.profile-menu li').forEach(li => li.classList.remove('active'));
+            el.classList.add('active');
+            renderPage(page);
+        }
+
+        function renderPage(page) {
+            const container = document.getElementById('profileContent');
+            const currentUser = UserManager.getCurrentUser();
+
+            switch (page) {
+                case 'info':
+                    renderInfoPage(container, currentUser);
+                    break;
+                case 'orders':
+                    renderOrdersPage(container, currentUser);
+                    break;
+                case 'address':
+                    renderAddressPage(container);
+                    break;
+                case 'security':
+                    renderSecurityPage(container);
+                    break;
+            }
+        }
+
+        // ============ 个人信息页 ============
+        let isEditing = false;
+
+        function renderInfoPage(container, user) {
+            container.innerHTML = `
+                <h3>个人信息</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">用户名</div>
+                        <div class="info-value">${user.username}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">会员等级</div>
+                        <div class="info-value">${user.level || '普通会员'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">邮箱</div>
+                        <div class="info-value" id="infoEmail">${user.email || '未设置'}</div>
+                        <input type="email" id="editEmail" value="${user.email || ''}" placeholder="请输入邮箱" style="display:none;">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">手机号</div>
+                        <div class="info-value" id="infoPhone">${user.phone || '未设置'}</div>
+                        <input type="text" id="editPhone" value="${user.phone || ''}" placeholder="请输入手机号" maxlength="11" style="display:none;">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">注册时间</div>
+                        <div class="info-value">${new Date(user.createTime).toLocaleDateString()}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">用户ID</div>
+                        <div class="info-value">${user.id}</div>
+                    </div>
+                </div>
+                <div style="margin-top:25px;">
+                    <button class="btn-save-profile" id="btnEditSave" onclick="toggleEdit()">编辑信息</button>
+                </div>
+            `;
+            isEditing = false;
+        }
+
+        function toggleEdit() {
+            isEditing = !isEditing;
+            const btn = document.getElementById('btnEditSave');
+            const emailValue = document.getElementById('infoEmail');
+            const phoneValue = document.getElementById('infoPhone');
+            const editEmail = document.getElementById('editEmail');
+            const editPhone = document.getElementById('editPhone');
+
+            if (isEditing) {
+                // 进入编辑模式
+                btn.textContent = '保存';
+                btn.style.background = '#2ba14b';
+                emailValue.style.display = 'none';
+                phoneValue.style.display = 'none';
+                editEmail.style.display = 'block';
+                editPhone.style.display = 'block';
+
+                // 添加取消按钮
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'btn-cancel-edit';
+                cancelBtn.id = 'btnCancelEdit';
+                cancelBtn.textContent = '取消';
+                cancelBtn.onclick = function() {
+                    isEditing = false;
+                    btn.textContent = '编辑信息';
+                    btn.style.background = '';
+                    emailValue.style.display = '';
+                    phoneValue.style.display = '';
+                    editEmail.style.display = 'none';
+                    editPhone.style.display = 'none';
+                    cancelBtn.remove();
+                };
+                btn.parentNode.appendChild(cancelBtn);
+            } else {
+                // 保存
+                const newEmail = editEmail.value.trim();
+                const newPhone = editPhone.value.trim();
+
+                if (newEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+                    showToast('请输入正确的邮箱地址');
+                    return;
+                }
+                if (newPhone && !/^1[3-9]\d{9}$/.test(newPhone)) {
+                    showToast('请输入正确的手机号');
+                    return;
+                }
+
+                const result = UserManager.updateUser({
+                    ...UserManager.getCurrentUser(),
+                    email: newEmail,
+                    phone: newPhone,
+                });
+
+                if (result.success) {
+                    showToast('信息更新成功');
+                    renderPage('info');
+                } else {
+                    showToast('更新失败');
+                }
+            }
+        }
+
+        // ============ 我的订单页 ============
+        function renderOrdersPage(container, user) {
+            const orders = OrderManager.getUserOrders();
+
+            container.innerHTML = `
+                <h3>我的订单</h3>
+                <div class="order-tabs">
+                    <div class="tab active" onclick="filterOrders('all', this)">全部订单</div>
+                    <div class="tab" onclick="filterOrders('待付款', this)">待付款</div>
+                    <div class="tab" onclick="filterOrders('待发货', this)">待发货</div>
+                    <div class="tab" onclick="filterOrders('已发货', this)">已发货</div>
+                    <div class="tab" onclick="filterOrders('已完成', this)">已完成</div>
+                </div>
+                <div id="orderList">
+                    ${renderOrderList(orders, 'all')}
+                </div>
+            `;
+        }
+
+        function renderOrderList(orders, filter) {
+            const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
+
+            if (filtered.length === 0) {
+                return `
+                    <div style="text-align:center;padding:60px 0;">
+                        <div style="font-size:50px;margin-bottom:15px;">📦</div>
+                        <p style="color:#999;">暂无订单</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top:15px;display:inline-block;">去购物</a>
+                    </div>
+                `;
+            }
+
+            return filtered.map(function(order) {
+                // 获取订单第一个商品的图片
+                var firstItem = order.items[0];
+                var productImg = '';
+                var imgBgColor = firstItem ? (firstItem.imgColor || '#ddd') : '#ddd';
+                var firstLetter = firstItem && firstItem.name ? firstItem.name.charAt(0) : '?';
+
+                if (firstItem) {
+                    var prod = JDData.getProductById(firstItem.productId);
+                    if (prod && prod.img) {
+                        productImg = '<img src="' + prod.img + '" alt="' + (prod.name || '') + '" style="width:100%;height:100%;object-fit:contain;background:#fff;">';
+                    } else if (firstItem.img) {
+                        productImg = '<img src="' + firstItem.img + '" alt="' + (firstItem.name || '') + '" style="width:100%;height:100%;object-fit:contain;background:#fff;">';
+                    }
+                }
+
+                var imgHtml = productImg || ('<span style="color:rgba(255,255,255,0.6);">' + firstLetter + '</span>');
+
+                return '<div class="order-card">' +
+                    '<div class="order-header">' +
+                        '<span>订单号：' + order.id + '</span>' +
+                        '<span>' + new Date(order.createTime).toLocaleString() + '</span>' +
+                        '<span>状态：<span style="color:var(--jd-red);">' + order.status + '</span></span>' +
+                    '</div>' +
+                    '<div class="order-body">' +
+                        '<div class="order-product-img" style="background:' + imgBgColor + ';">' + imgHtml + '</div>' +
+                        '<div class="order-product-info">' +
+                            '<div class="order-product-name">' +
+                                (firstItem ? firstItem.name : '商品') +
+                                (order.items.length > 1 ? ' 等' + order.items.length + '件商品' : '') +
+                            '</div>' +
+                            '<div class="order-product-spec">共 ' + order.items.reduce(function(s, i) { return s + i.quantity; }, 0) + ' 件商品</div>' +
+                        '</div>' +
+                        '<div class="order-amount">' + formatPrice(order.total) + '</div>' +
+                        '<div class="order-status">' + order.status + '</div>' +
+                        '<div>' +
+                            (order.status === '待付款'
+                                ? '<button class="btn-action primary" onclick="payOrder(\'' + order.id + '\')">立即付款</button><button class="btn-action" onclick="cancelOrder(\'' + order.id + '\')">取消订单</button>'
+                                : order.status === '已完成'
+                                    ? '<button class="btn-action" onclick="showToast(\'评价功能开发中\')">评价</button><button class="btn-action" onclick="showToast(\'已申请售后\')">申请售后</button>'
+                                    : '<button class="btn-action" onclick="showToast(\'物流查询功能开发中\')">查看物流</button>') +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function filterOrders(filter, el) {
+            document.querySelectorAll('.order-tabs .tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            const orders = OrderManager.getUserOrders();
+            document.getElementById('orderList').innerHTML = renderOrderList(orders, filter);
+        }
+
+        function payOrder(orderId) {
+            OrderManager.updateOrderStatus(orderId, '待发货');
+            showToast('支付成功！订单状态已更新');
+            setTimeout(() => renderPage('orders'), 500);
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm('确定要取消该订单吗？')) {
+                OrderManager.updateOrderStatus(orderId, '已取消');
+                showToast('订单已取消');
+                setTimeout(() => renderPage('orders'), 500);
+            }
+        }
+
+        // ============ 收货地址页 ============
+        function renderAddressPage(container) {
+            const addresses = AddressManager.getAddresses();
+
+            container.innerHTML = `
+                <h3>收货地址管理</h3>
+                <div class="address-list">
+                    ${addresses.map(addr => `
+                        <div class="address-card ${addr.isDefault ? 'active' : ''}" style="margin-bottom:10px;">
+                            ${addr.tag ? `<span class="addr-tag">${addr.tag}</span>` : ''}
+                            ${addr.isDefault ? '<span class="addr-tag" style="background:#e6a81c;">默认</span>' : ''}
+                            <div class="contact">${addr.name}</div>
+                            <div class="phone">${addr.phone}</div>
+                            <div class="addr-detail">${addr.province} ${addr.city} ${addr.detail}</div>
+                            <div style="margin-top:8px;">
+                                <button class="btn-action" onclick="setDefaultAddr(${addr.id})"
+                                    ${addr.isDefault ? 'disabled style="opacity:0.5;"' : ''}>
+                                    ${addr.isDefault ? '当前默认' : '设为默认'}
+                                </button>
+                                <button class="btn-action" onclick="deleteAddr(${addr.id})"
+                                    ${addr.isDefault ? 'disabled style="opacity:0.5;"' : ''}>
+                                    删除
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-primary" style="margin-top:15px;" onclick="window.location.href='order.html'">
+                    + 在订单页面添加新地址
+                </button>
+            `;
+        }
+
+        function setDefaultAddr(id) {
+            const addrs = AddressManager.getAddresses();
+            addrs.forEach(a => a.isDefault = (a.id === id));
+            AddressManager.saveAddresses(addrs);
+            showToast('默认地址已更新');
+            renderPage('address');
+        }
+
+        function deleteAddr(id) {
+            const addrs = AddressManager.getAddresses();
+            if (addrs.length <= 1) {
+                showToast('至少保留一个地址');
+                return;
+            }
+            if (confirm('确定要删除该地址吗？')) {
+                const newAddrs = addrs.filter(a => a.id !== id);
+                if (addrs.find(a => a.id === id)?.isDefault && newAddrs.length > 0) {
+                    newAddrs[0].isDefault = true;
+                }
+                AddressManager.saveAddresses(newAddrs);
+                showToast('地址已删除');
+                renderPage('address');
+            }
+        }
+
+        // ============ 安全设置页 ============
+        function renderSecurityPage(container) {
+            container.innerHTML = `
+                <h3>安全设置</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">登录密码</div>
+                        <div class="info-value">******** <a href="#" style="font-size:12px;color:var(--jd-red);margin-left:10px;">修改</a></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">绑定手机</div>
+                        <div class="info-value">${UserManager.getCurrentUser().phone || '未绑定'} <a href="#" style="font-size:12px;color:var(--jd-red);margin-left:10px;">${UserManager.getCurrentUser().phone ? '更换' : '绑定'}</a></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">绑定邮箱</div>
+                        <div class="info-value">${UserManager.getCurrentUser().email || '未绑定'} <a href="#" style="font-size:12px;color:var(--jd-red);margin-left:10px;">${UserManager.getCurrentUser().email ? '更换' : '绑定'}</a></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">账号安全等级</div>
+                        <div class="info-value" style="color:#2ba14b;font-weight:bold;">🔒 安全</div>
+                    </div>
+                </div>
+                <p style="margin-top:20px;font-size:13px;color:#999;">
+                    安全提示：建议定期修改密码，绑定手机和邮箱以保障账号安全。
+                </p>
+            `;
+        }
+
+        // ============ 初始渲染 ============
+        renderPage('info');
+    </script>
+</body>
+</html>

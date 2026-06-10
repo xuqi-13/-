@@ -1,0 +1,360 @@
+/* ============ 乐选购商城 - 公共样式 ============ */
+/* 学号：2024XXXXXX  姓名：XXX */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --jd-red: #c81623;
+    --jd-red-hover: #e33333;
+    --jd-orange: #f30213;
+    --jd-light-red: #e1251b;
+    --jd-bg: #f4f4f4;
+    --jd-white: #fff;
+    --jd-dark: #333;
+    --jd-gray: #666;
+    --jd-light-gray: #999;
+    --jd-border: #e0e0e0;
+    --jd-gold: #e6a81c;
+    --jd-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --jd-radius: 4px;
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--jd-bg);
+    color: var(--jd-dark);
+    min-width: 1200px;
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: var(--jd-dark);
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--jd-red);
+}
+
+ul, ol {
+    list-style: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+.container {
+    width: 1200px;
+    margin: 0 auto;
+}
+
+/* ============ 顶部工具栏 ============ */
+.top-bar {
+    background: #2e2e2e;
+    height: 30px;
+    line-height: 30px;
+    font-size: 12px;
+}
+
+.top-bar .container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.top-bar .location {
+    color: #ccc;
+}
+
+.top-bar .location a {
+    color: #ccc;
+    margin-right: 10px;
+}
+
+.top-bar .location a:hover {
+    color: #fff;
+}
+
+.top-bar .user-links a {
+    color: #ccc;
+    margin: 0 8px;
+}
+
+.top-bar .user-links a:hover {
+    color: #fff;
+}
+
+.top-bar .user-links .sep {
+    color: #555;
+}
+
+/* ============ 头部搜索区 ============ */
+.header {
+    background: var(--jd-white);
+    padding: 15px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header .container {
+    display: flex;
+    align-items: center;
+}
+
+.header .logo {
+    width: 190px;
+    margin-right: 40px;
+}
+
+.header .logo h1 {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--jd-red);
+    letter-spacing: 2px;
+}
+
+.header .logo h1 span {
+    font-size: 16px;
+    color: #999;
+    margin-left: 8px;
+    font-weight: normal;
+}
+
+/* 搜索框 */
+.search-box {
+    flex: 1;
+    display: flex;
+    margin-right: 60px;
+}
+
+.search-box input {
+    flex: 1;
+    height: 36px;
+    border: 2px solid var(--jd-red);
+    border-right: none;
+    padding: 0 15px;
+    font-size: 14px;
+    outline: none;
+    border-radius: 20px 0 0 20px;
+}
+
+.search-box input:focus {
+    border-color: var(--jd-red);
+}
+
+.search-box button {
+    width: 72px;
+    height: 36px;
+    background: var(--jd-red);
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 0 20px 20px 0;
+    transition: var(--transition);
+}
+
+.search-box button:hover {
+    background: var(--jd-red-hover);
+}
+
+/* 购物车图标 */
+.cart-icon {
+    position: relative;
+    cursor: pointer;
+    padding: 8px 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--jd-red);
+    transition: var(--transition);
+}
+
+.cart-icon:hover {
+    border-color: var(--jd-red);
+}
+
+.cart-icon .cart-count {
+    position: absolute;
+    top: -5px;
+    right: 5px;
+    background: var(--jd-red);
+    color: #fff;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+
+/* ============ 导航栏 ============ */
+.nav {
+    background: var(--jd-white);
+    border-bottom: 2px solid var(--jd-red);
+}
+
+.nav .container {
+    display: flex;
+}
+
+/* 全部分类 */
+.nav .all-category {
+    width: 200px;
+    background: var(--jd-red);
+    color: #fff;
+    text-align: center;
+    line-height: 44px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+}
+
+.nav .all-category:hover .category-dropdown {
+    display: block;
+}
+
+.category-dropdown {
+    display: none;
+    position: absolute;
+    top: 44px;
+    left: 0;
+    width: 200px;
+    background: var(--jd-white);
+    border: 1px solid #e0e0e0;
+    box-shadow: var(--jd-shadow);
+    z-index: 999;
+}
+
+.category-dropdown li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--jd-dark);
+    transition: var(--transition);
+    font-weight: normal;
+}
+
+.category-dropdown li:hover {
+    background: #f9f9f9;
+    color: var(--jd-red);
+}
+
+/* 导航链接 */
+.nav .nav-links {
+    display: flex;
+    line-height: 44px;
+    font-size: 15px;
+}
+
+.nav .nav-links a {
+    padding: 0 22px;
+    color: var(--jd-dark);
+}
+
+.nav .nav-links a.active,
+.nav .nav-links a:hover {
+    color: var(--jd-red);
+}
+
+/* ============ 底部 ============ */
+.footer {
+    background: #eaeaea;
+    padding: 30px 0;
+    margin-top: 40px;
+    border-top: 1px solid #ddd;
+}
+
+.footer .container {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    line-height: 2;
+}
+
+.footer .student-info {
+    color: var(--jd-red);
+    font-weight: bold;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+/* ============ 按钮通用 ============ */
+.btn {
+    display: inline-block;
+    padding: 8px 24px;
+    border: none;
+    border-radius: var(--jd-radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background: var(--jd-red);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--jd-red-hover);
+}
+
+.btn-outline {
+    background: #fff;
+    color: var(--jd-red);
+    border: 1px solid var(--jd-red);
+}
+
+.btn-outline:hover {
+    background: #fff5f5;
+}
+
+.btn-lg {
+    padding: 12px 40px;
+    font-size: 16px;
+}
+
+/* ============ Toast ============ */
+.toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 9999;
+    animation: fadeInOut 2s ease;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ============ 面包屑 ============ */
+.breadcrumb {
+    padding: 15px 0;
+    font-size: 13px;
+    color: #999;
+}
+
+.breadcrumb a {
+    color: #666;
+}
+
+.breadcrumb span {
+    margin: 0 6px;
+}

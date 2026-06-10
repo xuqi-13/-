@@ -1,0 +1,218 @@
+/* ============ 登录注册页面样式 ============ */
+
+.auth-page {
+    background: var(--jd-bg);
+    min-height: 100vh;
+}
+
+.auth-header {
+    background: #fff;
+    padding: 15px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.auth-header .logo a {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--jd-red);
+}
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+}
+
+.auth-card {
+    width: 400px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.auth-card h2 {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--jd-dark);
+}
+
+.auth-tabs {
+    display: flex;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 25px;
+}
+
+.auth-tabs .tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+    transition: var(--transition);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.auth-tabs .tab.active {
+    color: var(--jd-red);
+    border-bottom-color: var(--jd-red);
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    height: 42px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0 15px;
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition);
+}
+
+.form-group input:focus {
+    border-color: var(--jd-red);
+    box-shadow: 0 0 0 2px rgba(200,22,35,0.1);
+}
+
+.form-group .error-msg {
+    font-size: 12px;
+    color: var(--jd-red);
+    margin-top: 4px;
+    display: none;
+}
+
+.form-group.error input {
+    border-color: var(--jd-red);
+}
+
+.form-group.error .error-msg {
+    display: block;
+}
+
+.form-group.success input {
+    border-color: #2ba14b;
+}
+
+.form-group .input-icon {
+    position: absolute;
+    right: 12px;
+    top: 36px;
+    font-size: 18px;
+}
+
+.form-group.success .input-icon::after {
+    content: '✓';
+    color: #2ba14b;
+}
+
+.form-group.error .input-icon::after {
+    content: '✗';
+    color: var(--jd-red);
+}
+
+/* 验证码行 */
+.code-row {
+    display: flex;
+    gap: 10px;
+}
+
+.code-row input {
+    flex: 1;
+}
+
+.code-row .send-code {
+    width: 110px;
+    height: 42px;
+    background: var(--jd-red);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.code-row .send-code:hover {
+    background: var(--jd-red-hover);
+}
+
+.code-row .send-code.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* 协议 */
+.agreement {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 20px;
+}
+
+.agreement a {
+    color: var(--jd-red);
+}
+
+/* 提交按钮 */
+.auth-btn {
+    width: 100%;
+    height: 44px;
+    background: var(--jd-red);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.auth-btn:hover {
+    background: var(--jd-red-hover);
+}
+
+/* 其他方式 */
+.auth-other {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+}
+
+.auth-other a {
+    color: var(--jd-red);
+    margin-left: 5px;
+}
+
+/* 密码强度 */
+.password-strength {
+    height: 4px;
+    background: #eee;
+    margin-top: 6px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.password-strength .bar {
+    height: 100%;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.strength-weak .bar { width: 30%; background: #e1251b; }
+.strength-medium .bar { width: 60%; background: #e6a81c; }
+.strength-strong .bar { width: 100%; background: #2ba14b; }
