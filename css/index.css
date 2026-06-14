@@ -208,6 +208,19 @@
     padding: 0;
 }
 
+.seckill-btn {
+    margin-left: 12px;
+    background: var(--jd-red);
+    color: #fff;
+    padding: 4px 16px;
+    border-radius: 3px;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+.seckill-btn:hover { opacity: 0.85; }
+
 .seckill-products {
     display: flex;
     gap: 15px;
